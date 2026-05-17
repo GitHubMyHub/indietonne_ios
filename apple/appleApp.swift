@@ -11,7 +11,7 @@ import SwiftUI
 struct appleApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RegisterPage()
         }
     }
 }

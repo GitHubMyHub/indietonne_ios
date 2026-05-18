@@ -1,0 +1,14 @@
+// Debug.xcconfig
+// Debug-Konfiguration – Backend läuft lokal
+// Werte werden automatisch in Info.plist übernommen
+
+// xcconfig treats `//` as a comment, so we escape it with `/$()/`.
+BASE_URL = http:/$()/localhost:8080/graphql
+BASE_PICTURE_SERVICE_URL = http:/$()/localhost:3001/
+
+INFOPLIST_KEY_BASE_URL = $(BASE_URL)
+INFOPLIST_KEY_BASE_PICTURE_SERVICE_URL = $(BASE_PICTURE_SERVICE_URL)
+
+// Merge a hand-written Info.plist (NSAppTransportSecurity for HTTP backend)
+// with the auto-generated keys from INFOPLIST_KEY_*.
+INFOPLIST_FILE = Info.plist

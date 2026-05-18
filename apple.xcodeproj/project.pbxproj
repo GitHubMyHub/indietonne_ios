@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9DF10B902FBBC057008D38FF /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = AA000001000000000000AA02 /* Apollo */; };
+		9DF10B912FBBC057008D38FF /* ApolloAPI in Frameworks */ = {isa = PBXBuildFile; productRef = AA000001000000000000AA03 /* ApolloAPI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		9D0DC7D62F6855BF002209C6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +32,8 @@
 		9D0DC7C82F6855BE002209C6 /* apple.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = apple.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0DC7D52F6855BF002209C6 /* appleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = appleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D0DC7DF2F6855BF002209C6 /* appleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = appleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000001000000000000AA10 /* apple/config/Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = apple/config/Debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		AA000001000000000000AA11 /* apple/config/Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = apple/config/Release.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +59,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DF10B912FBBC057008D38FF /* ApolloAPI in Frameworks */,
+				9DF10B902FBBC057008D38FF /* Apollo in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +88,7 @@
 				9D0DC7D82F6855BF002209C6 /* appleTests */,
 				9D0DC7E22F6855BF002209C6 /* appleUITests */,
 				9D0DC7C92F6855BE002209C6 /* Products */,
+				9DF10E8E2FBBC2D4008D38FF /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -90,6 +100,15 @@
 				9D0DC7DF2F6855BF002209C6 /* appleUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9DF10E8E2FBBC2D4008D38FF /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				AA000001000000000000AA10 /* apple/config/Debug.xcconfig */,
+				AA000001000000000000AA11 /* apple/config/Release.xcconfig */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +131,8 @@
 			);
 			name = apple;
 			packageProductDependencies = (
+				AA000001000000000000AA02 /* Apollo */,
+				AA000001000000000000AA03 /* ApolloAPI */,
 			);
 			productName = apple;
 			productReference = 9D0DC7C82F6855BE002209C6 /* apple.app */;
@@ -195,6 +216,9 @@
 			);
 			mainGroup = 9D0DC7BF2F6855BE002209C6;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AA000001000000000000AA01 /* XCRemoteSwiftPackageReference "apollo-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9D0DC7C92F6855BE002209C6 /* Products */;
 			projectDirPath = "";
@@ -390,6 +414,7 @@
 		};
 		9D0DC7EA2F6855BF002209C6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA000001000000000000AA10 /* apple/config/Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -422,6 +447,7 @@
 		};
 		9D0DC7EB2F6855BF002209C6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA000001000000000000AA11 /* apple/config/Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -572,6 +598,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AA000001000000000000AA01 /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apollographql/apollo-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA000001000000000000AA02 /* Apollo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA000001000000000000AA01 /* XCRemoteSwiftPackageReference "apollo-ios" */;
+			productName = Apollo;
+		};
+		AA000001000000000000AA03 /* ApolloAPI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA000001000000000000AA01 /* XCRemoteSwiftPackageReference "apollo-ios" */;
+			productName = ApolloAPI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9D0DC7C02F6855BE002209C6 /* Project object */;
 }

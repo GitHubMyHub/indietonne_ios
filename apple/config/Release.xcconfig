@@ -1,0 +1,11 @@
+// Release.xcconfig
+// Release-Konfiguration – Backend-URL für Produktion
+
+// xcconfig treats `//` as a comment, so we escape it with `/$()/`.
+BASE_URL = https:/$()/api.indietonne.de/graphql
+BASE_PICTURE_SERVICE_URL = https:/$()/pictures.indietonne.de/
+
+INFOPLIST_KEY_BASE_URL = $(BASE_URL)
+INFOPLIST_KEY_BASE_PICTURE_SERVICE_URL = $(BASE_PICTURE_SERVICE_URL)
+
+INFOPLIST_FILE = Info.plist

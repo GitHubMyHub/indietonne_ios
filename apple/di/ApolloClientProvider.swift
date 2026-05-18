@@ -3,37 +3,45 @@
 //  apple
 //
 //  Erstellt zwei ApolloClients (unauthentifiziert + authentifiziert).
-//  Äquivalent zu Android `AppModule` + `AppModuleAuthenticated`.
-//
-//  ⚠️ Voraussetzung: Das SPM-Paket `apollo-ios` muss in Xcode hinzugefügt sein
-//     (https://github.com/apollographql/apollo-ios).
-//     Solange das Paket nicht eingebunden ist, ist diese Datei in einem
-//     `#if canImport(Apollo)` Block geschützt und führt nicht zu Build-Fehlern.
+//  Apollo iOS 2.x API.
 //
 
 import Foundation
-
-#if canImport(Apollo) && canImport(ApolloAPI)
 import Apollo
 import ApolloAPI
+
+/// Thread-safe token holder – nonisolated bridge from @MainActor TokenStore.
+final class TokenBox: @unchecked Sendable {
+    private var _token: String?
+    private let lock = NSLock()
+
+    var token: String? {
+        get { lock.withLock { _token } }
+        set { lock.withLock { _token = newValue } }
+    }
+}
 
 /// Liefert Apollo-Clients für authentifizierte und unauthentifizierte Requests.
 final class ApolloClientProvider {
     private let tokenStore: TokenStore
     private let serverURL: URL
+    let tokenBox = TokenBox()
 
     init(tokenStore: TokenStore, serverURL: URL = Constants.baseURL) {
         self.tokenStore = tokenStore
         self.serverURL = serverURL
+        #if DEBUG
+        print("[Apollo] endpoint = \(serverURL.absoluteString)")
+        #endif
     }
 
     /// Unauthentifizierter Client – für Login/Register/Password-Reset/Verify.
     lazy var unauthenticated: ApolloClient = {
         let store = ApolloStore()
-        let client = URLSessionClient()
-        let provider = DefaultInterceptorProvider(client: client, store: store)
         let transport = RequestChainNetworkTransport(
-            interceptorProvider: provider,
+            urlSession: URLSession.shared,
+            interceptorProvider: DefaultInterceptorProvider.shared,
+            store: store,
             endpointURL: serverURL
         )
         return ApolloClient(networkTransport: transport, store: store)
@@ -42,76 +50,52 @@ final class ApolloClientProvider {
     /// Authentifizierter Client – Bearer-Token wird automatisch injiziert.
     lazy var authenticated: ApolloClient = {
         let store = ApolloStore()
-        let client = URLSessionClient()
-        let provider = AuthenticatedInterceptorProvider(
-            client: client,
-            store: store,
-            tokenStore: tokenStore
-        )
+        let box = tokenBox
+        let provider = AuthenticatedInterceptorProvider(tokenBox: box)
         let transport = RequestChainNetworkTransport(
+            urlSession: URLSession.shared,
             interceptorProvider: provider,
+            store: store,
             endpointURL: serverURL
         )
         return ApolloClient(networkTransport: transport, store: store)
     }()
+
+    /// Must be called from @MainActor when the token changes.
+    @MainActor
+    func syncToken() {
+        tokenBox.token = tokenStore.token
+    }
 }
 
-// MARK: - Bearer-Token Interceptor
+// MARK: - Bearer-Token Interceptor (Apollo 2.x GraphQLInterceptor)
 
-private final class AuthorizationInterceptor: ApolloInterceptor {
-    var id: String = UUID().uuidString
-    private let tokenStore: TokenStore
+private struct AuthorizationInterceptor: GraphQLInterceptor {
+    let tokenBox: TokenBox
 
-    init(tokenStore: TokenStore) {
-        self.tokenStore = tokenStore
-    }
-
-    func interceptAsync<Operation: GraphQLOperation>(
-        chain: any RequestChain,
-        request: HTTPRequest<Operation>,
-        response: HTTPResponse<Operation>?,
-        completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
-    ) {
-        Task { @MainActor in
-            if let token = tokenStore.token, !token.isEmpty {
-                request.addHeader(name: "Authorization", value: "Bearer \(token)")
-            }
-            chain.proceedAsync(
-                request: request,
-                response: response,
-                interceptor: self,
-                completion: completion
-            )
+    func intercept<Request: GraphQLRequest>(
+        request: Request,
+        next: NextInterceptorFunction<Request>
+    ) async throws -> InterceptorResultStream<Request> {
+        var mutableRequest = request
+        if let token = tokenBox.token, !token.isEmpty {
+            mutableRequest.additionalHeaders["Authorization"] = "Bearer \(token)"
         }
+        return await next(mutableRequest)
     }
 }
 
-private final class AuthenticatedInterceptorProvider: DefaultInterceptorProvider {
-    private let tokenStore: TokenStore
+private final class AuthenticatedInterceptorProvider: InterceptorProvider, Sendable {
+    private let tokenBox: TokenBox
 
-    init(client: URLSessionClient, store: ApolloStore, tokenStore: TokenStore) {
-        self.tokenStore = tokenStore
-        super.init(client: client, store: store)
+    init(tokenBox: TokenBox) {
+        self.tokenBox = tokenBox
     }
 
-    override func interceptors<Operation: GraphQLOperation>(
+    func graphQLInterceptors<Operation: GraphQLOperation>(
         for operation: Operation
-    ) -> [any ApolloInterceptor] {
-        var interceptors = super.interceptors(for: operation)
-        interceptors.insert(AuthorizationInterceptor(tokenStore: tokenStore), at: 0)
-        return interceptors
+    ) -> [any GraphQLInterceptor] {
+        [AuthorizationInterceptor(tokenBox: tokenBox)] +
+        DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation)
     }
 }
-
-#else
-
-/// Stub-Implementation solange das Apollo-SPM-Paket nicht eingebunden ist.
-/// Sobald `apollo-ios` als Dependency verfügbar ist, wird der echte Provider
-/// (oben im `#if canImport(Apollo)` Block) verwendet.
-final class ApolloClientProvider {
-    init(tokenStore: TokenStore, serverURL: URL = Constants.baseURL) {
-        // Intentionally empty
-    }
-}
-
-#endif

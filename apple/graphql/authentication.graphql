@@ -1,0 +1,23 @@
+query SignIn($loginUser: LoginInput!) {
+    signIn(loginUser: $loginUser)
+}
+
+mutation SignUp($loginUser: SignUpInput!) {
+    signUp(loginUser: $loginUser)
+}
+
+mutation RequestPasswordReset($email: String!) {
+    requestPasswordReset(email: $email)
+}
+
+mutation ResetPassword($input: ResetPasswordInput!) {
+    resetPassword(input: $input)
+}
+
+mutation VerifyEmail($token: String!) {
+    verifyEmail(token: $token)
+}
+
+mutation ResendVerificationEmail($email: String!) {
+    resendVerificationEmail(email: $email)
+}

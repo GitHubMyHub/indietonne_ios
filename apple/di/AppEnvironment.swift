@@ -2,8 +2,7 @@
 //  AppEnvironment.swift
 //  apple
 //
-//  Zentraler Service-Container. Ersetzt Hilt-Module aus Android.
-//  Wird in `appleApp.swift` erzeugt und via `.environment(_:)` injiziert.
+//  Zentraler Service-Container.
 //
 
 import Foundation
@@ -37,15 +36,24 @@ final class AppEnvironment {
     init() {
         let keychain = KeychainService()
         let tokenStore = TokenStore(keychain: keychain)
+        let deviceInfo = DeviceInfoService()
         let apollo = ApolloClientProvider(tokenStore: tokenStore)
 
-        let authApi: AuthenticationApi = AuthRepositoryImpl()
-        let authenticatedApi: AuthenticatedApi = AuthenticatedRepositoryImpl()
+        // Sync initial token into TokenBox
+        apollo.tokenBox.token = tokenStore.token
+
+        let authApi: AuthenticationApi = AuthRepositoryImpl(
+            apollo: apollo.unauthenticated,
+            deviceInfo: deviceInfo
+        )
+        let authenticatedApi: AuthenticatedApi = AuthenticatedRepositoryImpl(
+            apollo: apollo.authenticated
+        )
         let imageRepository: ImageRepositoryProtocol = ImageRepositoryImpl()
 
         self.keychain = keychain
         self.tokenStore = tokenStore
-        self.deviceInfo = DeviceInfoService()
+        self.deviceInfo = deviceInfo
         self.apolloProvider = apollo
 
         self.authApi = authApi
@@ -60,5 +68,10 @@ final class AppEnvironment {
         self.resetPasswordUseCase = ResetPasswordUseCase(api: authApi)
         self.verifyEmailUseCase = VerifyEmailUseCase(api: authApi)
         self.resendVerificationUseCase = ResendVerificationUseCase(api: authApi)
+    }
+
+    /// Call after login/logout to sync the JWT token into the Apollo interceptor.
+    func tokenDidChange() {
+        apolloProvider.syncToken()
     }
 }

@@ -35,10 +35,14 @@ final class ScheduleViewModel {
     private func load() {
         Task { @MainActor in
             state.isLoading = true
+            state.error = ""
             do {
                 state.appointments = try await useCase.appointments(page: 0, size: 10)
                 state.isLoading = false
             } catch {
+                #if DEBUG
+                print("[ScheduleVM] load failed:", error)
+                #endif
                 state.error = error.localizedDescription
                 state.snackbar = "Failed to load appointments"
                 state.isLoading = false

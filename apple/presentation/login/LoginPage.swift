@@ -125,8 +125,10 @@ struct LoginPage: View {
         .onChange(of: viewModel?.state.token) { _, newToken in
             guard let token = newToken, !token.isEmpty else { return }
             tokenStore.setToken(token)
+            env.tokenDidChange()
+            // RootView observes tokenStore.isAuthenticated and switches the
+            // start destination to ScheduleOverviewPage automatically.
             path = NavigationPath()
-            path.append(AppRoute.scheduleOverview)
         }
     }
 }

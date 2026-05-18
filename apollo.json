@@ -1,0 +1,36 @@
+{
+  "schemaNamespace" : "InDieTonneAPI",
+  "input" : {
+    "operationSearchPaths" : [
+      "apple/graphql/**/*.graphql"
+    ],
+    "schemaSearchPaths" : [
+      "apple/graphql/schema.graphqls"
+    ]
+  },
+  "output" : {
+    "schemaTypes" : {
+      "path" : "apple/graphql/generated",
+      "moduleType" : {
+        "embeddedInTarget" : {
+          "name" : "apple"
+        }
+      }
+    },
+    "operations" : {
+      "inSchemaModule" : {}
+    },
+    "testMocks" : {
+      "none" : {}
+    }
+  },
+  "options" : {
+    "selectionSetInitializers" : {
+      "operations" : true,
+      "namedFragments" : true
+    },
+    "operationDocumentFormat" : [
+      "definition"
+    ]
+  }
+}

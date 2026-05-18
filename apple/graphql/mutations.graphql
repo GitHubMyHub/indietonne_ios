@@ -1,0 +1,16 @@
+mutation ScheduleAppointment($scheduleAppointment: ScheduleDataInput!) {
+    schedule(scheduleAppointment: $scheduleAppointment) {
+        id
+        fractions {
+            id
+            name
+            icon
+        }
+    }
+}
+
+mutation DeletePlatformUserPlaces($platformUserPlaceIds: [UUID!]!) {
+    deletePlatformUserPlaces(platformUserPlaceIds: $platformUserPlaceIds) {
+        id
+    }
+}

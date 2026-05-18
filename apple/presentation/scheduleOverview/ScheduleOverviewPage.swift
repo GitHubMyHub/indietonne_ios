@@ -22,6 +22,49 @@ struct ScheduleOverviewPage: View {
                     .listRowInsets(EdgeInsets())
                     .listRowSeparator(.hidden)
 
+                if viewModel?.state.isLoading == true && (viewModel?.state.appointments.isEmpty ?? true) {
+                    HStack {
+                        Spacer()
+                        ProgressView().padding()
+                        Spacer()
+                    }
+                    .listRowSeparator(.hidden)
+                } else if let err = viewModel?.state.error, !err.isEmpty,
+                          (viewModel?.state.appointments.isEmpty ?? true) {
+                    VStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.largeTitle)
+                            .foregroundStyle(.red)
+                        Text("Failed to load appointments")
+                            .font(.headline)
+                        Text(err)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                        Button("Retry") { viewModel?.onAction(.load) }
+                            .buttonStyle(.borderedProminent)
+                            .padding(.top, 4)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .listRowSeparator(.hidden)
+                } else if viewModel != nil && (viewModel?.state.appointments.isEmpty ?? true) {
+                    VStack(spacing: 8) {
+                        Image(systemName: "calendar.badge.exclamationmark")
+                            .font(.largeTitle)
+                            .foregroundStyle(.secondary)
+                        Text("No appointments yet")
+                            .font(.headline)
+                        Text("Tap + to add a place and schedule pickups.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
+                    .listRowSeparator(.hidden)
+                }
+
                 ForEach(viewModel?.state.appointments ?? []) { group in
                     PlaceListOverviewItem(
                         text: text(for: group),
@@ -72,6 +115,7 @@ struct ScheduleOverviewPage: View {
                     }
                     Button(role: .destructive) {
                         tokenStore.clear()
+                        env.tokenDidChange()
                         path = NavigationPath()
                         path.append(AppRoute.login)
                     } label: {

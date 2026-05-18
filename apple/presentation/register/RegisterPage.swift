@@ -40,6 +40,7 @@ struct RegisterPage: View {
         .onChange(of: viewModel?.state.token) { _, newToken in
             guard let token = newToken, !token.isEmpty else { return }
             tokenStore.setToken(token)
+            env.tokenDidChange()
             path = NavigationPath()
             path.append(AppRoute.scheduleOverview)
         }

@@ -1,0 +1,132 @@
+query Places($pagination: PaginationInput!) {
+    places(pagination: $pagination) {
+        number
+        size
+        totalElements
+        totalPages
+        content {
+            id
+            name
+            zipCodes
+            images {
+                storedName
+                origin
+            }
+            fractions {
+                id
+                name
+                icon
+            }
+        }
+    }
+}
+
+query Streets($pagination: PaginationInput!, $filter: StreetFiler!) {
+    streets(pagination: $pagination, filter: $filter) {
+        number
+        size
+        totalElements
+        totalPages
+        content {
+            id
+            name
+        }
+    }
+}
+
+query FindStreets($pagination: PaginationInput!, $search: String!) {
+    findStreets(pagination: $pagination, search: $search) {
+        content {
+            id
+            name
+        }
+    }
+}
+
+query Districts($pagination: PaginationInput!, $placeId: String) {
+    districts(pagination: $pagination, placeId: $placeId) {
+        content {
+            id
+            name
+        }
+    }
+}
+
+query Appointments($pagination: PaginationInput!) {
+    appointments(pagination: $pagination) {
+        number
+        size
+        totalElements
+        totalPages
+        content {
+            id
+            reminderAlarm
+            reminderNotify
+            appointments {
+                id
+                appointmentDate
+                scheduledDate
+                interval
+                repetition
+                alarm
+                notify
+                active
+                fractions {
+                    id
+                    name
+                    icon
+                }
+            }
+            street {
+                id
+                name
+                districts {
+                    id
+                    name
+                }
+            }
+            place {
+                id
+                zipCodes
+                name
+                images {
+                    storedName
+                    origin
+                }
+            }
+        }
+    }
+}
+
+query PlaceDetails($placeId: UUID!) {
+    place(placeId: $placeId) {
+        id
+        name
+        zipCodes
+        images {
+            storedName
+            origin
+        }
+        fractions {
+            id
+            name
+            icon
+        }
+    }
+}
+
+query CurrentUser {
+    users(pagination: { page: 0, size: 1 }) {
+        content {
+            id
+            username
+            devices {
+                id
+                token
+                agent
+                createdAt
+                updatedAt
+            }
+        }
+    }
+}
